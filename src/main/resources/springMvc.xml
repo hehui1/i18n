@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:mvc="http://www.springframework.org/schema/mvc"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+
+    <context:component-scan base-package="cn.com.dssp.controller"/>
+
+    <mvc:annotation-driven/>
+
+    <bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+        <property name="prefix" value="/WEB-INF/"/>
+        <property name="suffix" value=".jsp"/>
+    </bean>
+
+    <!--第一种通过加载properties配置文件来实现前端页面国际化-->
+    <!-- 国际化配置start -->
+    <!-- 国际化资源文件 messageSource配置的是国际化资源文件的路径， classpath:messages指的是classpath路径下的
+       messages_zh_CN.properties文件和messages_en_US.properties文件 设置“useCodeAsDefaultMessage”，默认为false，这样当Spring在ResourceBundle中找不到messageKey的话，就抛出NoSuchMessageException，
+       把它设置为True，则找不到不会抛出异常，而是使用messageKey作为返回值。 -->
+    <bean id="messageSource" class="org.springframework.context.support.ResourceBundleMessageSource">
+        <!-- 表示语言配置文件是以message开头的文件（message.properties）-->
+        <property name="defaultEncoding" value="UTF-8" />
+        <property name="basename" value="locale"/>
+        <property name="useCodeAsDefaultMessage" value="true" />
+    </bean>
+
+    <!-- 配置SessionLocaleResolver用于将Locale对象存储于Session中供后续使用 -->
+    <bean id="localeResolver" class="org.springframework.web.servlet.i18n.SessionLocaleResolver">
+        <property name="defaultLocale" value="zh" />
+    </bean>
+    <!--该拦截器通过名为”locale”的参数来拦截HTTP请求，使其重新设置页面的区域化信息 -->
+    <mvc:interceptors>
+        <bean id="localeChangeInterceptor"
+              class="org.springframework.web.servlet.i18n.LocaleChangeInterceptor">
+            <property name="paramName" value="locale" />
+        </bean>
+    </mvc:interceptors>
+
+   <!-- 第二种方式通过自定义配置messagesource-->
+   <!-- <bean id="propertiesMessageSource"  class="org.springframework.context.support.ReloadableResourceBundleMessageSource">
+        <property name="useCodeAsDefaultMessage" value="true" />
+    </bean>
+    <mvc:interceptors>
+        &lt;!&ndash; 国际化操作拦截器 如果采用基于（请求/Session/Cookie）则必需配置 &ndash;&gt;
+        <bean class="org.springframework.web.servlet.i18n.LocaleChangeInterceptor" />
+    </mvc:interceptors>
+    <bean id="localeResolver" class="org.springframework.web.servlet.i18n.SessionLocaleResolver">
+        <property name="defaultLocale" value="zh" />
+    </bean>
+    &lt;!&ndash; 数据库国际化资源 自定义的MessageResource &ndash;&gt;
+    <bean id="messageSource" class="cn.com.dssp.utils.MessageResource">
+        <property name="parentMessageSource" ref="propertiesMessageSource"/>
+    </bean>-->
+</beans>
